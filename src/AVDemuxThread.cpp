@@ -195,7 +195,7 @@ void AVDemuxThread::stepBackward()
                 const qreal dt = t0 - ts.back();
                 pts = ts.back();
                 // FIXME: sometimes can not seek to the previous pts, the result pts is always current pts, so let the target pts a little earlier
-                pts -= dt/2.0;
+				pts -= dt;
             }
             qDebug("step backward: %lld, %f", qint64(pts*1000.0), pts);
             demux_thread->video_thread->setDropFrameOnSeek(false);
