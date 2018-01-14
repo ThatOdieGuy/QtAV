@@ -1566,11 +1566,8 @@ void AVPlayer::stepForward()
 
 void AVPlayer::stepBackward()
 {
-    d->clock->pause(true);
-    d->state = PausedState;
-    Q_EMIT stateChanged(d->state);
-    Q_EMIT paused(true);
-    d->read_thread->stepBackward();
+	pause(true);
+	d->read_thread->stepBackward();
 }
 
 void AVPlayer::seek(qreal r)
