@@ -59,6 +59,8 @@ public:
     MediaEndAction mediaEndAction() const;
     void setMediaEndAction(MediaEndAction value);
     bool waitForStarted(int msec = -1);
+
+	bool hasSeekTasks();
 Q_SIGNALS:
     void requestClockPause(bool value);
     void mediaStatusChanged(QtAV::MediaStatus);
@@ -84,7 +86,7 @@ private:
     void setAVThread(AVThread *&pOld, AVThread* pNew);
     void newSeekRequest(QRunnable *r);
     void processNextSeekTask();
-    void seekInternal(qint64 pos, SeekType type); //must call in AVDemuxThread
+	void seekInternal(qint64 pos, SeekType type); //must call in AVDemuxThread
     void pauseInternal(bool value);
 
     bool paused;
@@ -100,6 +102,7 @@ private:
     QMutex buffer_mutex;
     QWaitCondition cond;
     BlockingQueue<QRunnable*> seek_tasks;
+	QAtomicInt running_seek_tasks;
 
     QSemaphore sem;
     QMutex next_frame_mutex;

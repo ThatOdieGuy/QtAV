@@ -848,6 +848,24 @@ qint64 AVPlayer::position() const
     return pts;
 }
 
+qint64 AVPlayer::displayPosition() const
+{
+	// Return a cached value if there are seek tasks
+	if (d->seeking || d->read_thread->hasSeekTasks()) {
+		return d->last_known_good_pts;
+	}
+
+	// TODO: videoTime()?
+	const qint64 pts = d->clock->value()*1000.0;
+
+	if (pts < 0) {
+		return d->last_known_good_pts;
+	}
+	d->last_known_good_pts = pts;
+
+	return pts;
+}
+
 void AVPlayer::setPosition(qint64 position)
 {
     // FIXME: strange things happen if seek out of eof

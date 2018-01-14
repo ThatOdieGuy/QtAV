@@ -82,6 +82,7 @@ AVDemuxThread::AVDemuxThread(QObject *parent) :
   , audio_thread(0)
   , video_thread(0)
   , clock_type(-1)
+  , running_seek_tasks(0)
 {
     seek_tasks.setCapacity(1);
     seek_tasks.blockFull(false);
@@ -95,6 +96,7 @@ AVDemuxThread::AVDemuxThread(AVDemuxer *dmx, QObject *parent) :
   , m_buffer(0)
   , audio_thread(0)
   , video_thread(0)
+  , running_seek_tasks(0)
 {
     setDemuxer(dmx);
     seek_tasks.setCapacity(1);
@@ -289,6 +291,8 @@ void AVDemuxThread::seekInternal(qint64 pos, SeekType type)
 
 void AVDemuxThread::newSeekRequest(QRunnable *r)
 {
+	running_seek_tasks = 1;
+
     if (seek_tasks.size() >= seek_tasks.capacity()) {
         QRunnable *r = seek_tasks.take();
         if (r && r->autoDelete())
@@ -297,16 +301,27 @@ void AVDemuxThread::newSeekRequest(QRunnable *r)
     seek_tasks.put(r);
 }
 
+
 void AVDemuxThread::processNextSeekTask()
 {
     if (seek_tasks.isEmpty())
         return;
     QRunnable *task = seek_tasks.take();
-    if (!task)
-        return;
-    task->run();
-    if (task->autoDelete())
-        delete task;
+	if (task) {
+		task->run();
+
+		if (task->autoDelete())
+			delete task;
+	}
+
+	if (seek_tasks.isEmpty()) {
+		running_seek_tasks = 0;
+	}
+}
+
+bool AVDemuxThread::hasSeekTasks()
+{
+	return !seek_tasks.isEmpty() || running_seek_tasks;
 }
 
 void AVDemuxThread::pauseInternal(bool value)
@@ -542,6 +557,7 @@ void AVDemuxThread::run()
     }
     connect(thread, SIGNAL(seekFinished(qint64)), this, SIGNAL(seekFinished(qint64)), Qt::DirectConnection);
     seek_tasks.clear();
+	running_seek_tasks = 0;
     int was_end = 0;
     if (ademuxer) {
         ademuxer->seek(0LL);
