@@ -153,12 +153,13 @@ AVThread* AVDemuxThread::audioThread()
 
 void AVDemuxThread::stepBackward()
 {
-	if (running_seek_tasks)
+	if (hasSeekTasks())
 		return;
 
     if (!video_thread)
         return;
-    AVThread *t = video_thread;
+
+    AVThread *t = video_thread;	
     const qreal pre_pts = video_thread->previousHistoryPts();
     if (pre_pts == 0.0) {
         qWarning("can not get previous pts");
@@ -190,12 +191,18 @@ void AVDemuxThread::stepBackward()
                     t = demux_thread->demuxer->packet().pts;
                     ts.push_back(t);
                 }
-                const qreal t0 = ts.back();
-                ts.pop_back();
-                const qreal dt = t0 - ts.back();
-                pts = ts.back();
-                // FIXME: sometimes can not seek to the previous pts, the result pts is always current pts, so let the target pts a little earlier
-				pts -= dt;
+				if (ts.count() > 1) {
+					const qreal t0 = ts.back();
+					ts.pop_back();
+					const qreal dt = t0 - ts.back();
+					pts = ts.back();
+					// FIXME: sometimes can not seek to the previous pts, the result pts is always current pts, so let the target pts a little earlier
+					pts -= dt;
+				}
+				else {
+					qDebug("ts.count was < 2");
+					return;
+				}
             }
             qDebug("step backward: %lld, %f", qint64(pts*1000.0), pts);
             demux_thread->video_thread->setDropFrameOnSeek(false);
@@ -422,7 +429,7 @@ MediaEndAction AVDemuxThread::mediaEndAction() const
 
 void AVDemuxThread::stepForward()
 {
-	if (running_seek_tasks)
+	if (hasSeekTasks())
 		return;
     if (end)
         return;
