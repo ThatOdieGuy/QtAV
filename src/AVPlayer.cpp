@@ -583,6 +583,9 @@ void AVPlayer::pause(bool p)
         return;
     if (isPaused() == p)
         return;
+	if (!p && position() != displayPosition()) {
+		seek(displayPosition());
+	}
     audio()->pause(p);
     //pause thread. check pause state?
     d->read_thread->pause(p);
@@ -855,8 +858,7 @@ qint64 AVPlayer::displayPosition() const
 		return d->last_known_good_pts;
 	}
 
-	// TODO: videoTime()?
-	const qint64 pts = d->clock->value()*1000.0;
+	const qint64 pts = d->clock->videoTime()*1000.0;
 
 	if (pts < 0) {
 		return d->last_known_good_pts;
