@@ -854,7 +854,7 @@ qint64 AVPlayer::position() const
 qint64 AVPlayer::displayPosition() const
 {
 	// Return a cached value if there are seek tasks
-	if (d->seeking || d->read_thread->hasSeekTasks()) {
+	if (d->seeking || d->read_thread->hasSeekTasks() || (d->read_thread->buffer() && d->read_thread->buffer()->isBuffering())) {
 		return d->last_known_good_pts;
 	}
 
