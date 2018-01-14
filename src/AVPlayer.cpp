@@ -1566,6 +1566,10 @@ void AVPlayer::stepForward()
 
 void AVPlayer::stepBackward()
 {
+	//This is not a good fix, but if we're at the start of the video stepping backwards can break stepping and playback
+	if (displayPosition() < 500)
+		return;
+
 	pause(true);
 	d->read_thread->stepBackward();
 }
