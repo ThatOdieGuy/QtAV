@@ -153,6 +153,9 @@ AVThread* AVDemuxThread::audioThread()
 
 void AVDemuxThread::stepBackward()
 {
+	if (running_seek_tasks)
+		return;
+
     if (!video_thread)
         return;
     AVThread *t = video_thread;
@@ -419,6 +422,8 @@ MediaEndAction AVDemuxThread::mediaEndAction() const
 
 void AVDemuxThread::stepForward()
 {
+	if (running_seek_tasks)
+		return;
     if (end)
         return;
     // clock type will be wrong if no lock because slot frameDeliveredOnStepForward() is in video thread
