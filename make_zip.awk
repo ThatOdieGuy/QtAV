@@ -10,7 +10,7 @@
 BEGIN {
     out_dir = "..\\rewrite\\"
     rewrite_bat = "build\\debug\\sdk_install_rewrite.bat"
-    tar_file = "..\\qtav.tar"
+    tar_file = "build\\qtav.zip"
 }
 /C:\\Qt\\5.9.9\\/ {gsub (/C:\\Qt\\5.9.9\\/, out_dir); print > rewrite_bat }
 END {
