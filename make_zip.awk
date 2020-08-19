@@ -15,7 +15,7 @@ BEGIN {
 /C:\\Qt\\5.9.9\\/ {gsub (/C:\\Qt\\5.9.9\\/, out_dir); print > rewrite_bat }
 END {
   system(shell_quote(rewrite_bat))
-  tar_command = ("tar -a -c "  "-f " shell_quote(tar_file) " " shell_quote(out_dir))
+  tar_command = shell_quote("tar -a -c -f " tar_file " " out_dir)
   print tar_command
   system(tar_command)
 }
