@@ -3,21 +3,16 @@
 # here hardcoded to build\rewrite
 # the rewritten batch file will end up in build\debug alongside the original
 # this script then runs the resulting batch file which will copy the content into out_dir
-# this script will then zip up the contents of the temporary folder build\rewrite
-# saving it in the build folder
+
 # call this script like: awk -f make_zip.awk build\debug\sdk_install.bat
 
 BEGIN {
     out_dir = "build\\rewrite\\"
     rewrite_bat = "build\\debug\\sdk_install_rewrite.bat"
-    tar_file = "build\\qtav.zip"
 }
 /C:\\Qt\\5.9.9\\/ {gsub (/C:\\Qt\\5.9.9\\/, out_dir); print > rewrite_bat }
 END {
   system(shell_quote(rewrite_bat))
-  tar_command = shell_quote("tar -a -c -f " tar_file " " out_dir)
-  print tar_command
-  system(tar_command)
 }
 
 
