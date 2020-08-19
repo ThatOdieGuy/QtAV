@@ -8,7 +8,7 @@
 # call this script like: awk -f make_zip.awk build\debug\sdk_install.bat
 
 BEGIN {
-    out_dir = "..\\rewrite\\"
+    out_dir = "build\\rewrite\\"
     rewrite_bat = "build\\debug\\sdk_install_rewrite.bat"
     tar_file = "build\\qtav.zip"
 }
