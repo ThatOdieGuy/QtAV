@@ -2,7 +2,8 @@
 # Go through the batch file replaceing all instances of "C:\\Qt\\5.9.9" with a temporary directory
 # here hardcoded to build\rewrite
 # the rewritten batch file will end up in build\debug alongside the original
-# run the resulting batch file and zip up the contents of the temporary folder build\rewrite
+# this script then runs the resulting batch file which will copy the content into out_dir
+# this script will then zip up the contents of the temporary folder build\rewrite
 # saving it in the build folder
 # call this script like: awk -f make_zip.awk build\debug\sdk_install.bat
 
@@ -11,7 +12,7 @@ BEGIN {
     rewrite_bat = "build\\debug\\sdk_install_rewrite.bat"
     tar_file = "..\\qtav.tar"
 }
-/C:\\Qt\\5.9.9\\/ {gsub (/C:\\Qt\\5.9.9\\/, out_dir); print >> rewrite_bat }
+/C:\\Qt\\5.9.9\\/ {gsub (/C:\\Qt\\5.9.9\\/, out_dir); print > rewrite_bat }
 END {
   system(shell_quote(rewrite_bat))
   tar_command = ("tar -a -c "  "-f " shell_quote(tar_file) " " shell_quote(out_dir))
