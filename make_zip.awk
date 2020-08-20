@@ -7,11 +7,13 @@
 # call this script like: awk -f make_zip.awk build\debug\sdk_install.bat
 
 BEGIN {
-    out_dir = "build\\rewrite\\"
+    out_dir = "build\\rewrite\\"  # has to exist before
     rewrite_bat = "build\\debug\\sdk_install_rewrite.bat"
+    print ("Rewriting " rewrite_bat " to " rewrite_bat)
 }
 /C:\\Qt\\5.9.9\\/ {gsub (/C:\\Qt\\5.9.9\\/, out_dir); print > rewrite_bat }
 END {
+  print("Executing " rewrite_bat)
   system(shell_quote(rewrite_bat))
 }
 
